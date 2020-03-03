@@ -148,11 +148,13 @@ public class Model
         // * If a brick has been hit, change its 'visible' setting to   *
         // * false so that it will 'disappear'                          * 
         // **************************************************************
+
         for (GameObj brick: bricks) {
             if (brick.isVisible() && brick.hitBy(ball)) {
                 hit = true;
                 brick.setVisible(false);      // set the brick invisible
                 addToScore( HIT_BRICK );    // add to score for hitting a brick
+                bricks.remove(brick); // removing the brick from the array, it's not longer needed and garbage collection can clear it up.
             }
         }    
 

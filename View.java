@@ -113,7 +113,7 @@ public class View implements EventHandler<KeyEvent>
             // * Remember only a visible brick is to be displayed         *
             // ************************************************************
             for (GameObj brick: bricks) {
-                if (brick.visible) {
+                if (brick.isVisible()) {
                     displayGameObj(gc, brick);
                 }
             }           
@@ -123,8 +123,8 @@ public class View implements EventHandler<KeyEvent>
     // Display a game object - it is just a rectangle on the canvas
     public void displayGameObj( GraphicsContext gc, GameObj go )
     {
-        gc.setFill( go.colour );
-        gc.fillRect( go.topX, go.topY, go.width, go.height );
+        gc.setFill( go.getColor());
+        gc.fillRect( go.getTopX(), go.getTopY(), go.getWidth(), go.getHeight() );
     }
 
     // This is how the Model talks to the View

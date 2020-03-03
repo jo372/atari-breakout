@@ -111,7 +111,8 @@ public class Model
             {
                 updateGame();                        // update the game state
                 modelChanged();                      // Model changed - refresh screen
-                Thread.sleep( getFast() ? 10 : 20 ); // wait a few milliseconds
+                Thread.sleep(1000/70);
+                //Thread.sleep( getFast() ? 10 : 20 ); // wait a few milliseconds
             }
         } catch (Exception e) 
         { 
@@ -126,8 +127,8 @@ public class Model
         ball.moveX(BALL_MOVE);                      
         ball.moveY(BALL_MOVE);
         // get the current ball possition (top left corner)
-        int x = ball.topX;  
-        int y = ball.topY;
+        int x = ball.getTopX();  
+        int y = ball.getTopY();
         // Deal with possible edge of board hit
         if (x >= width - B - BALL_SIZE)  ball.changeDirectionX();
         if (x <= 0 + B)  ball.changeDirectionX();
@@ -148,9 +149,9 @@ public class Model
         // * false so that it will 'disappear'                          * 
         // **************************************************************
         for (GameObj brick: bricks) {
-            if (brick.visible && brick.hitBy(ball)) {
+            if (brick.isVisible() && brick.hitBy(ball)) {
                 hit = true;
-                brick.visible = false;      // set the brick invisible
+                brick.setVisible(false);      // set the brick invisible
                 addToScore( HIT_BRICK );    // add to score for hitting a brick
             }
         }    

@@ -67,18 +67,6 @@ public class GameObj
         this.setTopY(this.getTopY() + (units * this.getDirY()) );
     }
 
-    // change direction of movement in x axis (-1, 0 or +1)
-    public void changeDirectionX()
-    {
-        this.setDirX(-this.getDirX());
-    }
-
-    // change direction of movement in y axis (-1, 0 or +1)
-    public void changeDirectionY()
-    {
-        this.setDirY(-this.getDirY());
-    }
-
     // Detect collision between this object and the argument object
     // It's easiest to work out if they do NOT overlap, and then
     // return the negative (with the ! at the beginning)

@@ -28,9 +28,9 @@ public class View implements EventHandler<KeyEvent>
     public Controller controller;
     public Model model;
 
-    public GameObj   bat;            // The bat
-    public GameObj   ball;           // The ball
-    public ArrayList<GameObj> bricks;     // The bricks
+    public BatObj   bat;            // The bat
+    public BallObj   ball;           // The ball
+    public ArrayList<BrickObj> bricks;     // The bricks
     public int       score =  0;     // The score
    
     // we don't really need a constructor method, but include one to print a 

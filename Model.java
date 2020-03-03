@@ -31,9 +31,9 @@ public class Model
 
     // The game 'model' - these represent the state of the game
     // and are used by the View to display it
-    public GameObj ball;                // The ball
-    public ArrayList<GameObj> bricks;   // The bricks
-    public GameObj bat;                 // The bat
+    public BallObj ball;                // The ball
+    public ArrayList<BrickObj> bricks;   // The bricks
+    public BatObj bat;                 // The bat
     public int score = 0;               // The score
 
     // variables that control the game 
@@ -58,8 +58,8 @@ public class Model
     public void initialiseGame()
     {       
         score = 0;
-        ball   = new GameObj(width/2, height/2, BALL_SIZE, BALL_SIZE, Color.RED );
-        bat    = new GameObj(width/2, height - BRICK_HEIGHT*3/2, BRICK_WIDTH*3, 
+        ball   = new BallObj(width/2, height/2, BALL_SIZE, BALL_SIZE, Color.RED );
+        bat    = new BatObj(width/2, height - BRICK_HEIGHT*3/2, BRICK_WIDTH*3, 
             BRICK_HEIGHT/4, Color.GRAY);
         bricks = new ArrayList<>();
         // *[1]******************************************************[1]*
@@ -68,7 +68,7 @@ public class Model
         int WALL_TOP = 100;                     // how far down the screen the wall starts
         int NUM_BRICKS = width/BRICK_WIDTH;     // how many bricks fit on screen
         for (int i=0; i < NUM_BRICKS; i++) {
-            GameObj brick = new GameObj(BRICK_WIDTH*i, WALL_TOP, BRICK_WIDTH, BRICK_HEIGHT, Color.BLUE);
+            BrickObj brick = new BrickObj(BRICK_WIDTH*i, WALL_TOP, BRICK_WIDTH, BRICK_HEIGHT, Color.BLUE);
             bricks.add(brick);      // add this brick to the list of bricks
         }
     }
@@ -148,11 +148,13 @@ public class Model
         // * If a brick has been hit, change its 'visible' setting to   *
         // * false so that it will 'disappear'                          * 
         // **************************************************************
+
         for (GameObj brick: bricks) {
             if (brick.isVisible() && brick.hitBy(ball)) {
                 hit = true;
                 brick.setVisible(false);      // set the brick invisible
                 addToScore( HIT_BRICK );    // add to score for hitting a brick
+                bricks.remove(brick); // removing the brick from the array, it's not longer needed and garbage collection can clear it up.
             }
         }    
 
@@ -204,19 +206,19 @@ public class Model
     }
 
     // Return bat object
-    public synchronized GameObj getBat()
+    public synchronized BatObj getBat()
     {
         return(bat);
     }
     
     // return ball object
-    public synchronized GameObj getBall()
+    public synchronized BallObj getBall()
     {
         return(ball);
     }
     
     // return bricks
-    public synchronized ArrayList<GameObj> getBricks()
+    public synchronized ArrayList<BrickObj> getBricks()
     {
         return(bricks);
     }

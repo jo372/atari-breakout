@@ -5,47 +5,78 @@ import javafx.scene.paint.*;
 public class GameObj
 {
     // state variables for a game object
-    public boolean visible  = true;     // Can see (change to false when the brick gets hit)
-    public int topX   = 0;              // Position - top left corner X
-    public int topY   = 0;              // position - top left corner Y
-    public int width  = 0;              // Width of object
-    public int height = 0;              // Height of object
-    public Color colour;                // Colour of object
-    public int   dirX   = 1;            // Direction X (1 or -1)
-    public int   dirY   = 1;            // Direction Y (1 or -1)
-
+    private boolean visible  = true;     // Can see (change to false when the brick gets hit)
+    private int topX   = 0;              // Position - top left corner X
+    private int topY   = 0;              // position - top left corner Y
+    private int width  = 0;              // Width of object
+    private int height = 0;              // Height of object
+    private Color colour;                // Colour of object
+    private int dirX   = 1;            // Direction X (1 or -1)
+    private int dirY   = 1;            // Direction Y (1 or -1)
 
     public GameObj( int x, int y, int w, int h, Color c )
     {
-        topX   = x;       
-        topY = y;
-        width  = w; 
-        height = h; 
-        colour = c;
+        this.setTopX(x);
+        this.setTopY(y);
+        this.setWidth(w);
+        this.setHeight(h);
+        this.setColor(c);
     }
-
+    
+    public void setVisible(boolean newVisibility) { this.visible = newVisibility; }
+    
+    public boolean isVisible() { return this.visible; }
+    
+    public int getTopX() { return this.topX; }
+    
+    public void setTopX(int newTopXValue) { this.topX = newTopXValue; }
+    
+    public int getTopY() { return this.topY; }
+    
+    public void setTopY(int newTopYValue) { this.topY = newTopYValue; }
+    
+    public int getWidth() { return this.width; }
+   
+    public void setWidth(int newWidth) { this.width = newWidth; }
+    
+    public int getHeight() { return this.height; }
+    
+    public void setHeight(int newHeight) { this.height = newHeight; }
+    
+    public Color getColor() { return this.colour; }
+    
+    public void setColor(Color newColor) { this.colour = newColor; }
+    
+    public int getDirX() { return this.dirX; }
+    
+    public void setDirX(int newDirX) { this.dirX = newDirX; }
+    
+    public int getDirY() { return this.dirY; }
+    
+    public void setDirY(int newDirY) { this.dirY = newDirY; }
+    
     // move in x axis
     public void moveX( int units )
     {
-        topX += units * dirX;
+        this.setTopX(this.getTopX() + (units * this.getDirX()) );
     }
 
     // move in y axis
     public void moveY( int units )
     {
-        topY += units * dirY;
+        this.setTopY(this.getTopY() + (units * this.getDirY()) );
     }
 
     // change direction of movement in x axis (-1, 0 or +1)
     public void changeDirectionX()
     {
-        dirX = -dirX;
+        this.setDirX(-this.getDirX());
     }
 
     // change direction of movement in y axis (-1, 0 or +1)
     public void changeDirectionY()
     {
-        dirY = -dirY;
+        this.setDirY(-this.getDirY());
     }
 
     // Detect collision between this object and the argument object
@@ -53,11 +84,10 @@ public class GameObj
     // return the negative (with the ! at the beginning)
     public boolean hitBy( GameObj obj )
     {
-        return ! ( topX >= obj.topX+obj.width     ||
-            topX+width <= obj.topX         ||
-            topY >= obj.topY+obj.height    ||
-            topY+height <= obj.topY );
-
+        return !(this.getTopX() >= (obj.getTopX() + obj.getWidth()) ||
+                (this.getTopX() + this.getWidth()) <= obj.getTopX() ||
+                this.getTopY() >= (obj.getTopY() + obj.getHeight()) ||
+                (this.getTopY() + this.getHeight()) <= obj.getTopY());
     }
 
 }

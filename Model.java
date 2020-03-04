@@ -15,9 +15,9 @@ public class Model
     public int B              = 6;      // Border round the edge of the panel
     public int M              = 40;     // Height of menu bar space at the top
 
-    public int BALL_SIZE      = 30;     // Ball side
-    public int BRICK_WIDTH    = 50;     // Brick size
-    public int BRICK_HEIGHT   = 30;
+    public int BALL_SIZE      = 10;     // Ball side
+    public int BRICK_WIDTH    = 40;     // Brick size
+    public int BRICK_HEIGHT   = 20;
 
     public int BAT_MOVE       = 5;      // Distance to move bat on each keypress
     public int BALL_MOVE      = 3;      // Units to move the ball on each step
@@ -41,35 +41,41 @@ public class Model
     public boolean fast = false;        // Set true to make the ball go faster
 
     // initialisation parameters for the model
-    public int width;                   // Width of game
-    public int height;                  // Height of game
+    public int windowWidth;                   // Width of game
+    public int windowHeight;                  // Height of game
 
     // CONSTRUCTOR - needs to know how big the window will be
     public Model( int w, int h )
     {
         Debug.trace("Model::<constructor>");  
-        width = w; 
-        height = h;
-
-
+        windowWidth = w; 
+        windowHeight = h;
     }
 
     // Initialise the game - reset the score and create the game objects 
     public void initialiseGame()
     {       
         score = 0;
-        ball   = new BallObj(width/2, height/2, BALL_SIZE, BALL_SIZE, Color.RED );
-        bat    = new BatObj(width/2, height - BRICK_HEIGHT*3/2, BRICK_WIDTH*3, 
+        ball   = new BallObj(windowWidth/2, windowHeight/2, BALL_SIZE, BALL_SIZE, Color.RED );
+        bat    = new BatObj(windowWidth/2, windowHeight - BRICK_HEIGHT*3/2, BRICK_WIDTH*3, 
             BRICK_HEIGHT/4, Color.GRAY);
         bricks = new ArrayList<>();
         // *[1]******************************************************[1]*
         // * Fill in code to add the bricks to the arrayList            *
         // **************************************************************
-        int WALL_TOP = 100;                     // how far down the screen the wall starts
-        int NUM_BRICKS = width/BRICK_WIDTH;     // how many bricks fit on screen
-        for (int i=0; i < NUM_BRICKS; i++) {
-            BrickObj brick = new BrickObj(BRICK_WIDTH*i, WALL_TOP, BRICK_WIDTH, BRICK_HEIGHT, Color.BLUE);
-            bricks.add(brick);      // add this brick to the list of bricks
+        int NUM_BRICKS = windowWidth/BRICK_WIDTH;     // how many bricks fit on screen
+        
+        int rowCounter = 0;
+        int maxRowsCounter = 4;
+        int columnCounter = 0;
+        int maxColumnCounter = 10;
+        BRICK_WIDTH = windowWidth/maxColumnCounter;
+        
+        for (rowCounter = 0; rowCounter < maxRowsCounter; rowCounter++) { 
+            for (columnCounter = 0; columnCounter < maxColumnCounter; columnCounter++) {
+                BrickObj brick = new BrickObj(BRICK_WIDTH*columnCounter, rowCounter*BRICK_HEIGHT, BRICK_WIDTH, BRICK_HEIGHT, Color.BLUE);
+                bricks.add(brick);      // add this brick to the list of bricks
+            }
         }
     }
 
@@ -93,7 +99,6 @@ public class Model
     // Start the animation thread
     public void startGame()
     {
-        
         Thread t = new Thread( this::runGame );     // create a thread runnng the runGame method
         t.setDaemon(true);                          // Tell system this thread can die when it finishes
         t.start();                                  // Start the thread running
@@ -130,9 +135,9 @@ public class Model
         int x = ball.getTopX();  
         int y = ball.getTopY();
         // Deal with possible edge of board hit
-        if (x >= width - B - BALL_SIZE)  ball.changeDirectionX();
+        if (x >= windowWidth - B - BALL_SIZE)  ball.changeDirectionX();
         if (x <= 0 + B)  ball.changeDirectionX();
-        if (y >= height - B - BALL_SIZE)  // Bottom
+        if (y >= windowHeight - B - BALL_SIZE)  // Bottom
         { 
             ball.changeDirectionY(); 
             addToScore( HIT_BOTTOM );     // score penalty for hitting the bottom of the screen
@@ -148,16 +153,16 @@ public class Model
         // * If a brick has been hit, change its 'visible' setting to   *
         // * false so that it will 'disappear'                          * 
         // **************************************************************
-
-        for (GameObj brick: bricks) {
-            if (brick.isVisible() && brick.hitBy(ball)) {
+        for(int i=0; i < bricks.size(); i++) {
+            BrickObj brick = bricks.get(i);
+            if(brick.isVisible() && brick.hitBy(ball)) {
                 hit = true;
-                brick.setVisible(false);      // set the brick invisible
-                addToScore( HIT_BRICK );    // add to score for hitting a brick
-                bricks.remove(brick); // removing the brick from the array, it's not longer needed and garbage collection can clear it up.
+                brick.setVisible(false); // set the brick invisible
+                addToScore(HIT_BRICK); // add to score for hitting a brick
+                bricks.remove(i); // removing the brick from the array, it's not longer needed and garbage collection can clear it up.
             }
-        }    
-
+        }
+    
         if (hit)
             ball.changeDirectionY();
 

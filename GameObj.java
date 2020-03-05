@@ -13,7 +13,9 @@ public class GameObj
     private Color colour;                // Colour of object
     private int dirX   = 1;            // Direction X (1 or -1)
     private int dirY   = 1;            // Direction Y (1 or -1)
-
+    private int moveSpeed = 3; 
+    private double opacity = 1.0;
+    
     public GameObj( int x, int y, int w, int h, Color c )
     {
         this.setTopX(x);
@@ -55,6 +57,15 @@ public class GameObj
     
     public void setDirY(int newDirY) { this.dirY = newDirY; }
     
+    public int getMoveSpeed() { return this.moveSpeed; }
+    
+    public void setMoveSpeed(int newMoveSpeed) { this.moveSpeed = newMoveSpeed; }
+    
+    public void setOpacity(double newOpacity) { 
+        this.opacity = newOpacity;
+    }
+    
+    public double getOpacity() { return this.opacity; }
     // move in x axis
     public void moveX( int units )
     {

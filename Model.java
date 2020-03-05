@@ -11,17 +11,10 @@ import javafx.application.Platform;
 public class Model 
 {
     // First,a collection of useful values for calculating sizes and layouts etc.
-
-    public int B              = 6;      // Border round the edge of the panel
-    public int M              = 40;     // Height of menu bar space at the top
-
     public int BALL_SIZE      = 10;     // Ball side
     public int BRICK_WIDTH    = 40;     // Brick size
     public int BRICK_HEIGHT   = 20;
-
-    public int BAT_MOVE       = 5;      // Distance to move bat on each keypress
-    public int BALL_MOVE      = 3;      // Units to move the ball on each step
-
+    
     public int HIT_BRICK      = 50;     // Score for hitting a brick
     public int HIT_BOTTOM     = -200;   // Score (penalty) for hitting the bottom of the screen
 
@@ -32,10 +25,13 @@ public class Model
     // The game 'model' - these represent the state of the game
     // and are used by the View to display it
     public BallObj ball;                // The ball
+    public int ballX = 0;
+    public int ballY = 0;
+    
     public ArrayList<BrickObj> bricks;   // The bricks
     public BatObj bat;                 // The bat
     public int score = 0;               // The score
-
+ 
     // variables that control the game 
     public boolean gameRunning = true;  // Set false to stop the game
     public boolean fast = false;        // Set true to make the ball go faster
@@ -57,8 +53,12 @@ public class Model
     {       
         score = 0;
         ball   = new BallObj(windowWidth/2, windowHeight/2, BALL_SIZE, BALL_SIZE, Color.RED );
+        ball.setMoveSpeed(3);
+        
         bat    = new BatObj(windowWidth/2, windowHeight - BRICK_HEIGHT*3/2, BRICK_WIDTH*3, 
             BRICK_HEIGHT/4, Color.GRAY);
+        bat.setMoveSpeed(3);
+        
         bricks = new ArrayList<>();
         // *[1]******************************************************[1]*
         // * Fill in code to add the bricks to the arrayList            *
@@ -124,26 +124,26 @@ public class Model
             Debug.error("Model::runAsSeparateThread error: " + e.getMessage() );
         }
     }
-  
+
     // updating the game - this happens about 50 times a second to give the impression of movement
     public synchronized void updateGame()
     {
         // move the ball one step (the ball knows which direction it is moving in)
-        ball.moveX(BALL_MOVE);                      
-        ball.moveY(BALL_MOVE);
+        ball.moveX(ball.getMoveSpeed());                      
+        ball.moveY(ball.getMoveSpeed());
         // get the current ball possition (top left corner)
-        int x = ball.getTopX();  
-        int y = ball.getTopY();
+        ballX = ball.getTopX();  
+        ballY = ball.getTopY();
         // Deal with possible edge of board hit
-        if (x >= windowWidth - B - BALL_SIZE)  ball.changeDirectionX();
-        if (x <= 0 + B)  ball.changeDirectionX();
-        if (y >= windowHeight - B - BALL_SIZE)  // Bottom
+        if (ballX >= windowWidth - BALL_SIZE)  ball.changeDirectionX();
+        if (ballX <= 0)  ball.changeDirectionX();
+        if (ballY >= windowHeight - BALL_SIZE)  // Bottom
         { 
             ball.changeDirectionY(); 
             addToScore( HIT_BOTTOM );     // score penalty for hitting the bottom of the screen
         }
-        if (y <= 0 + M)  ball.changeDirectionY();
-
+        if (ballY <= 0)  ball.changeDirectionY();
+            
        // check whether ball has hit a (visible) brick
         boolean hit = false;
 
@@ -243,7 +243,7 @@ public class Model
     // move the bat one step - -1 is left, +1 is right
     public synchronized void moveBat( int direction )
     {        
-        int dist = direction * BAT_MOVE;    // Actual distance to move
+        int dist = direction * bat.getMoveSpeed();    // Actual distance to move
         Debug.trace( "Model::moveBat: Move bat = " + dist );
         bat.moveX(dist);
     }

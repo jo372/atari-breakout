@@ -18,7 +18,9 @@ public class View implements EventHandler<KeyEvent>
     // variables for components of the user interface
     public int width;       // width of window
     public int height;      // height of window
-
+    
+    //https://www.youtube.com/watch?v=-vP3XSoAr4Q&list=RDQM10JdQFoApS8&index=2
+    
     // usr interface objects
     public Pane pane;       // basic layout pane
     public Canvas canvas;   // canvas to draw game on

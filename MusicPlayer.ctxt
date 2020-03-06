@@ -1,0 +1,21 @@
+#BlueJ class context
+comment0.target=MusicPlayer
+comment1.params=songId
+comment1.target=void\ playSongById(int)
+comment2.params=
+comment2.target=javafx.scene.media.Media\ getMedia()
+comment3.params=
+comment3.target=javafx.scene.media.MediaPlayer\ getMediaPlayer()
+comment4.params=
+comment4.target=void\ resumeSong()
+comment5.params=
+comment5.target=void\ pause()
+comment6.params=
+comment6.target=void\ stop()
+comment7.params=
+comment7.target=void\ play()
+comment8.params=
+comment8.target=java.util.ArrayList\ getMediaList()
+comment9.params=baseDirectory
+comment9.target=MusicPlayer(java.lang.String)
+numComments=10

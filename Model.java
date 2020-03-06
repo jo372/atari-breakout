@@ -1,7 +1,9 @@
 import java.util.ArrayList;
 import javafx.scene.paint.*;
 import javafx.application.Platform;
-
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import java.io.File;
 // The model represents all the actual content and functionality of the app
 // For Breakout, it manages all the game objects that the View needs
 // (the bat, ball, bricks, and the score), provides methods to allow the Controller
@@ -57,9 +59,16 @@ public class Model
         
         bat    = new BatObj(windowWidth/2, windowHeight - BRICK_HEIGHT*3/2, BRICK_WIDTH*3, 
             BRICK_HEIGHT/4, Color.GRAY);
-        bat.setMoveSpeed(3);
+        // setting the bat move speed.
+        bat.setMoveSpeed(3); 
         
         bricks = new ArrayList<>();
+        
+        Media test = new Media(new File("resources/music/2.mp3").toURI().toString());
+        MediaPlayer musicPlayer = new MediaPlayer(test);
+        musicPlayer.play();
+        //MusicPlayer musicPlayer = new MusicPlayer("resources/music/");
+        
         // *[1]******************************************************[1]*
         // * Fill in code to add the bricks to the arrayList            *
         // **************************************************************
@@ -73,10 +82,11 @@ public class Model
         
         for (rowCounter = 0; rowCounter < maxRowsCounter; rowCounter++) { 
             for (columnCounter = 0; columnCounter < maxColumnCounter; columnCounter++) {
-                BrickObj brick = new BrickObj(BRICK_WIDTH*columnCounter, rowCounter*BRICK_HEIGHT, BRICK_WIDTH, BRICK_HEIGHT, Color.BLUE);
+                BrickObj brick = new BrickObj(BRICK_WIDTH*columnCounter, rowCounter*BRICK_HEIGHT, BRICK_WIDTH, BRICK_HEIGHT,Color.BLUE);
                 bricks.add(brick);      // add this brick to the list of bricks
             }
         }
+
     }
 
     // Animating the game

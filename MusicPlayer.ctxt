@@ -1,0 +1,13 @@
+#BlueJ class context
+comment0.target=MusicPlayer
+comment1.params=songId
+comment1.target=void\ playSongById(int)
+comment2.params=
+comment2.target=void\ resumeSong()
+comment3.params=
+comment3.target=void\ restartPlaylist()
+comment4.params=
+comment4.target=java.util.ArrayList\ getMediaList()
+comment5.params=baseDirectory
+comment5.target=MusicPlayer(java.lang.String)
+numComments=6

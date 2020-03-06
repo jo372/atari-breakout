@@ -58,7 +58,6 @@ public class MusicPlayer
             String path = baseDirectory + fileName;
             this.mediaPaths.add(new File(path).toURI().toString());
         }
-        playSongById(0);
     }
     
     

@@ -3,6 +3,7 @@ import javafx.scene.paint.*;
 import javafx.application.Platform;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 // The model represents all the actual content and functionality of the app
 // For Breakout, it manages all the game objects that the View needs
 // (the bat, ball, bricks, and the score), provides methods to allow the Controller
@@ -44,6 +45,7 @@ public class Model
     MusicPlayer musicPlayer;
     boolean musicInitalised = false;
     int songId = 0;
+    Duration mediaDuration;
     // CONSTRUCTOR - needs to know how big the window will be
     public Model( int w, int h )
     {
@@ -76,15 +78,14 @@ public class Model
         int NUM_BRICKS = windowWidth/BRICK_WIDTH;     // how many bricks fit on screen
         
         int rowCounter = 0;
-        int maxRowsCounter = 4;
+        int maxRowsCounter = 2;
         int columnCounter = 0;
-        int maxColumnCounter = 10;
+        int maxColumnCounter = 20;
         BRICK_WIDTH = windowWidth/maxColumnCounter;
-        
         for (rowCounter = 0; rowCounter < maxRowsCounter; rowCounter++) { 
             for (columnCounter = 0; columnCounter < maxColumnCounter; columnCounter++) {
                 BrickObj brick = new BrickObj(BRICK_WIDTH*columnCounter, rowCounter*BRICK_HEIGHT, BRICK_WIDTH, BRICK_HEIGHT,Color.BLUE);
-                bricks.add(brick);      // add this brick to the list of bricks
+                bricks.add(brick);       // add this brick to the list of bricks
             }
         }
 
@@ -142,18 +143,20 @@ public class Model
         if (!musicInitalised) { 
             musicPlayer.playSongById(songId);
             musicInitalised = true;
-        } else {
-            // checking the duration and making sure the song has finished.
-            if(musicPlayer.getMediaPlayer().getCurrentTime() != musicPlayer.getMediaPlayer().totalDurationProperty()) 
-            {
-                if(songId > musicPlayer.getMediaList().size()) { 
-                    songId = 0; 
-                } else { 
-                    songId ++; 
-                }
-                musicPlayer.playSongById(songId);
-            }
+            mediaDuration = musicPlayer.getMedia().getDuration();
         }
+        // checking the duration and making sure the song has finished.
+        //musicPlayer.getMediaPlayer().getCurrentTime().greaterThanOrEqualTo()
+        if(musicPlayer.getMediaPlayer().getCurrentTime() != musicPlayer.getMedia().getDuration()) 
+        {
+            if(songId > musicPlayer.getMediaList().size()) { 
+                songId = 0; 
+            } else { 
+                songId ++; 
+            }
+            musicPlayer.playSongById(songId);
+        }
+        
         
         
         // move the ball one step (the ball knows which direction it is moving in)

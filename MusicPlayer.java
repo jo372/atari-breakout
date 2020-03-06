@@ -6,55 +6,59 @@ import java.util.ArrayList;
 
 public class MusicPlayer
 {
-    private ArrayList<Media> mediaList;
-
+    private ArrayList<String> mediaPaths;
+    private MediaPlayer mediaPlayer;
+    private Media media; 
+    private boolean isPaused = false;
+    
     public void playSongById(int songId) {
         if (songId > this.getMediaList().size()) 
         {
         } 
         else 
         {
-             MediaPlayer mediaPlayer = new MediaPlayer(mediaList.get(songId));
-             mediaPlayer.setAutoPlay(true);
+             media = new Media(this.mediaPaths.get(songId));
+             mediaPlayer = new MediaPlayer(media);
+             this.play();
         }
     }
+    
+    public Media getMedia() { return this.media; }
+    
+    public MediaPlayer getMediaPlayer() { return this.mediaPlayer; }
     
     public void resumeSong() {
-    
+        if(isPaused) { 
+            this.play();
+            isPaused = false;
+        }
     }
     
-    public void restartPlaylist() {
-    
+    public void pause() {
+        mediaPlayer.pause();
     }
     
-    public ArrayList<Media> getMediaList() {
-        return this.mediaList;
+    public void stop() {
+        mediaPlayer.stop();
     }
     
+    public void play() {
+        mediaPlayer.play();
+    }
+    
+    public ArrayList<String> getMediaList() {
+        return this.mediaPaths;
+    }
+
     public MusicPlayer(String baseDirectory)
     {
-        File songDirectory = new File(baseDirectory);
-  
+        File songDirectory = new File(baseDirectory); 
+        this.mediaPaths = new ArrayList<String>();
         for (String fileName: songDirectory.list()) {
             String path = baseDirectory + fileName;
-            Media newMedia = new Media(new File(path).toURI().toString());
-            mediaList.add(newMedia);
-            
-            Debug.trace(path);
+            this.mediaPaths.add(new File(path).toURI().toString());
         }
-       
-        
-       /* 
-        * 
-        * String songDirectoryPath = "./resources/music/";
-        File songDirectory = new File(songDirectoryPath);
-        String[] files = songDirectory.list();
-        
-        for (String file: files) {
-            Debug.trace(URLEncoder.encode(file));
-        }
-        * 
-        */
+        playSongById(0);
     }
     
     

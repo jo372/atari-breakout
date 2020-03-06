@@ -3,7 +3,6 @@ import javafx.scene.paint.*;
 import javafx.application.Platform;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import java.io.File;
 // The model represents all the actual content and functionality of the app
 // For Breakout, it manages all the game objects that the View needs
 // (the bat, ball, bricks, and the score), provides methods to allow the Controller
@@ -41,7 +40,10 @@ public class Model
     // initialisation parameters for the model
     public int windowWidth;                   // Width of game
     public int windowHeight;                  // Height of game
-
+    
+    MusicPlayer musicPlayer;
+    boolean musicInitalised = false;
+    int songId = 0;
     // CONSTRUCTOR - needs to know how big the window will be
     public Model( int w, int h )
     {
@@ -63,11 +65,10 @@ public class Model
         bat.setMoveSpeed(3); 
         
         bricks = new ArrayList<>();
-        
-        Media test = new Media(new File("resources/music/2.mp3").toURI().toString());
-        MediaPlayer musicPlayer = new MediaPlayer(test);
-        musicPlayer.play();
-        //MusicPlayer musicPlayer = new MusicPlayer("resources/music/");
+        // declaring a new media player.
+        musicPlayer = new MusicPlayer("resources/music/");
+
+        // TODO: add code to add songs 
         
         // *[1]******************************************************[1]*
         // * Fill in code to add the bricks to the arrayList            *
@@ -138,6 +139,23 @@ public class Model
     // updating the game - this happens about 50 times a second to give the impression of movement
     public synchronized void updateGame()
     {
+        if (!musicInitalised) { 
+            musicPlayer.playSongById(songId);
+            musicInitalised = true;
+        } else {
+            // checking the duration and making sure the song has finished.
+            if(musicPlayer.getMediaPlayer().getCurrentTime() != musicPlayer.getMediaPlayer().totalDurationProperty()) 
+            {
+                if(songId > musicPlayer.getMediaList().size()) { 
+                    songId = 0; 
+                } else { 
+                    songId ++; 
+                }
+                musicPlayer.playSongById(songId);
+            }
+        }
+        
+        
         // move the ball one step (the ball knows which direction it is moving in)
         ball.moveX(ball.getMoveSpeed());                      
         ball.moveY(ball.getMoveSpeed());

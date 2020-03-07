@@ -1,4 +1,3 @@
-
 import java.util.ArrayList;
 import javafx.event.EventHandler;
 import javafx.scene.input.*;
@@ -18,7 +17,8 @@ public class View implements EventHandler<KeyEvent>
     // variables for components of the user interface
     public int width;       // width of window
     public int height;      // height of window
-    
+    public Color BACKGROUND_COLOR = Color.BLACK;
+    public Color FONT_COLOR = Color.WHITE;
     //https://www.youtube.com/watch?v=-vP3XSoAr4Q&list=RDQM10JdQFoApS8&index=2
     
     // usr interface objects
@@ -67,11 +67,12 @@ public class View implements EventHandler<KeyEvent>
         infoText = new Label("BreakOut: Score = " + score);
         infoText.setTranslateX(50);
         infoText.setTranslateY(10);
+        infoText.setTextFill(FONT_COLOR);
         pane.getChildren().add(infoText);  // add label to the pane
 
         // add the complete GUI to the scene
         Scene scene = new Scene(pane);   
-        scene.getStylesheets().add("breakout.css"); // tell the app to use our css file
+        //scene.getStylesheets().add("breakout.css"); // tell the app to use our css file
 
         // Add an event handler for key presses. We use the View object itself
         // and provide a handle method to be called when a key is pressed.
@@ -99,12 +100,12 @@ public class View implements EventHandler<KeyEvent>
             GraphicsContext gc = canvas.getGraphicsContext2D();
 
             // clear the canvas to redraw
-            gc.setFill( Color.WHITE );
+            gc.setFill(BACKGROUND_COLOR);
             gc.fillRect( 0, 0, width, height );
             
             // update score
             infoText.setText("BreakOut: Score = " + score);
-
+            
             // draw the bat and ball
             displayGameObj( gc, ball );   // Display the Ball
             displayGameObj( gc, bat  );   // Display the Bat

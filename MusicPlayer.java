@@ -3,6 +3,13 @@ import java.net.URLEncoder;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Arrays;
+import java.util.Collections; 
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 
 public class MusicPlayer
 {
@@ -10,8 +17,10 @@ public class MusicPlayer
     private MediaPlayer mediaPlayer;
     private Media media; 
     private boolean isPaused = false;
+    private String[] whitelistedExtensions = new String[] {"mp3"};
     
     public void playSongById(int songId) {
+        // checking for out of bounds.
         if (songId > this.getMediaList().size()) 
         {
         } 
@@ -25,7 +34,7 @@ public class MusicPlayer
     
     public Media getMedia() { return this.media; }
     
-    public MediaPlayer getMediaPlayer() { return this.mediaPlayer; }
+    public MediaPlayer getPlayer() { return this.mediaPlayer; }
     
     public void resumeSong() {
         if(isPaused) { 
@@ -36,6 +45,7 @@ public class MusicPlayer
     
     public void pause() {
         mediaPlayer.pause();
+        isPaused = true;
     }
     
     public void stop() {
@@ -49,7 +59,11 @@ public class MusicPlayer
     public ArrayList<String> getMediaList() {
         return this.mediaPaths;
     }
-
+    
+    public boolean hasSongs() {
+        return this.getMediaList().size() > 0;
+    }
+    
     public MusicPlayer(String baseDirectory)
     {
         File songDirectory = new File(baseDirectory); 
@@ -58,6 +72,7 @@ public class MusicPlayer
             String path = baseDirectory + fileName;
             this.mediaPaths.add(new File(path).toURI().toString());
         }
+        Collections.shuffle(mediaPaths); 
     }
     
     

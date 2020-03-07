@@ -16,6 +16,8 @@ public class GameObj
     private int moveSpeed = 3; 
     private double opacity = 1.0;
     
+    // TODO: add velocity.
+    
     public GameObj( int x, int y, int w, int h, Color c )
     {
         this.setTopX(x);

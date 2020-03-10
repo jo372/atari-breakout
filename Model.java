@@ -13,7 +13,6 @@ import java.util.Arrays;
 // every 20 milliseconds and checks for collisions 
 public class Model 
 {
-    
     public Color BAT_COLOR = Color.web("#C84848");
     public Color BALL_COLOR = Color.web("#C84848");
     public ArrayList<Color> BRICK_COLORS = new ArrayList<Color>(Arrays.asList(
@@ -48,16 +47,16 @@ public class Model
 
     // variables that control the game 
     public boolean gameRunning = true;  // Set false to stop the game
-    public boolean fast = false;        // Set true to make the ball go faster
-
+    
     // initialisation parameters for the model
     public int windowWidth;                   // Width of game
     public int windowHeight;                  // Height of game
 
     MusicPlayer musicPlayer;
     boolean musicInitalised = false;
+    
     int songId = 0;
-    Duration mediaDuration;
+    
     // CONSTRUCTOR - needs to know how big the window will be
     public Model( int w, int h )
     {
@@ -240,19 +239,7 @@ public class Model
     {  
         return gameRunning;
     }
-
-    // Change game speed - false is normal speed, true is fast
-    public synchronized void setFast(Boolean value)
-    {  
-        fast = value;
-    }
-
-    // Return game speed - false is normal speed, true is fast
-    public synchronized Boolean getFast()
-    {  
-        return(fast);
-    }
-
+    
     // Return bat object
     public synchronized BatObj getBat()
     {

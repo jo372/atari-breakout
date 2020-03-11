@@ -152,18 +152,17 @@ public class Model
     // updating the game - this happens about 50 times a second to give the impression of movement
     public synchronized void updateGame()
     {
-
+        // if the music hasn't initalised and has songs, play first song.
         if (!musicInitalised && musicPlayer.hasSongs()) { 
             musicInitalised = true;
-            // playing the first song if there is music.
             musicPlayer.playSongById(songId);
         } else {
-            // TODO: implement it so it it will continue to the next track after the song has finished.
+            // if the music player's time is greater than or equal to the song duration increment songid.
             if(musicPlayer.getPlayer().getCurrentTime().greaterThanOrEqualTo(musicPlayer.getMedia().getDuration())) 
             {
                 songId++;
                 musicPlayer.playSongById(songId);
-                
+                // if the songId is equal to that of the medialist size, we're on the last song :(, time to repeat.
                 if(songId == musicPlayer.getMediaList().size() -1) { 
                     songId = 0; 
                 }

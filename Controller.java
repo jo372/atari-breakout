@@ -33,6 +33,10 @@ public class Controller
       case RIGHT:                    // Right arrow
         model.moveBat( +1 );         // Move bat right
         break;
+      case F:
+        model.isGameOver = true;
+      case R:
+        model.isGameOver = false;
       case S :
         // stop the game
         model.setGameRunning(false);

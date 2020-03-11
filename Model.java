@@ -47,7 +47,7 @@ public class Model
 
     // variables that control the game 
     public boolean gameRunning = true;  // Set false to stop the game
-    
+    public boolean isGameOver = false;
     // initialisation parameters for the model
     public int windowWidth;                   // Width of game
     public int windowHeight;                  // Height of game
@@ -127,7 +127,10 @@ public class Model
         t.setDaemon(true);                          // Tell system this thread can die when it finishes
         t.start();                                  // Start the thread running
     }   
-
+    
+    //TODO: implement a pause game, we can do this by stop the ball and bat moving.
+    // need to store their previous values elsewhere and reset when the game isn't paused anymore.
+    
     // The main animation loop
 
     public void runGame()
@@ -152,6 +155,7 @@ public class Model
     // updating the game - this happens about 50 times a second to give the impression of movement
     public synchronized void updateGame()
     {
+        if (bricks.size() == 0) { isGameOver = true; }
         // if the music hasn't initalised and has songs, play first song.
         if (!musicInitalised && musicPlayer.hasSongs()) { 
             musicInitalised = true;

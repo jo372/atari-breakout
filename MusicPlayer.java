@@ -17,7 +17,8 @@ public class MusicPlayer
     private MediaPlayer mediaPlayer;
     private Media media; 
     private boolean isPaused = false;
-    private String[] whitelistedExtensions = new String[] {"mp3"};
+    private boolean isMuted = false;
+    //private String[] whitelistedExtensions = new String[] {"mp3"};
     
     public void playSongById(int songId) {
         // checking for out of bounds.
@@ -26,8 +27,12 @@ public class MusicPlayer
         } 
         else 
         {
+            
              media = new Media(this.mediaPaths.get(songId));
              mediaPlayer = new MediaPlayer(media);
+             
+             
+             if (this.isMuted) { this.mute(); }
              this.play();
         }
     }
@@ -44,16 +49,26 @@ public class MusicPlayer
     }
     
     public void pause() {
-        mediaPlayer.pause();
+        this.getPlayer().pause();
         isPaused = true;
     }
     
     public void stop() {
-        mediaPlayer.stop();
+        this.getPlayer().stop();
     }
     
     public void play() {
-        mediaPlayer.play();
+        this.getPlayer().play();
+    }
+    
+    public void mute() {
+        this.getPlayer().setMute(true);
+        isMuted = true;
+    }
+    
+    public void unmute() {
+        this.getPlayer().setMute(false);
+        isMuted = false;
     }
     
     public ArrayList<String> getMediaList() {

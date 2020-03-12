@@ -27,11 +27,6 @@ public class View implements EventHandler<KeyEvent>
     public Canvas canvas;   // canvas to draw game on
     public Label infoText;  // info at top of screen
     
-    public Label GameOverText;
-    
-    String GameOverOriginalText = "Game Over! press R to start.";
-    public boolean gameOver = false;
-    
     // The other parts of the model-view-controller setup
     public Controller controller;
     public Model model;
@@ -76,14 +71,6 @@ public class View implements EventHandler<KeyEvent>
         infoText.setTextFill(FONT_COLOR);
         pane.getChildren().add(infoText);  // add label to the pane
         
-        GameOverText = new Label("");
-        GameOverText.setTranslateX(width/3);
-        GameOverText.setTranslateY(50);
-        GameOverText.setTextFill(FONT_COLOR);
-        GameOverText.setFont(new Font(30));
-        
-        pane.getChildren().add(GameOverText);
-        
         // add the complete GUI to the scene
         Scene scene = new Scene(pane);   
         //scene.getStylesheets().add("breakout.css"); // tell the app to use our css file
@@ -119,10 +106,7 @@ public class View implements EventHandler<KeyEvent>
             
             // update score
             infoText.setText("BreakOut: Score = " + score);
-            
-            if(gameOver) {
-                GameOverText.setText(GameOverOriginalText);
-            }
+ 
             // draw the bat and ball
             displayGameObj( gc, ball );   // Display the Ball
             displayGameObj( gc, bat  );   // Display the Bat
@@ -157,7 +141,6 @@ public class View implements EventHandler<KeyEvent>
         bricks  = model.getBricks();            // Bricks
         bat     = model.getBat();               // Bat
         score   = model.getScore();             // Score
-        gameOver = model.isGameOver;
         //Debug.trace("Update");
         drawPicture();                     // Re draw game
     }

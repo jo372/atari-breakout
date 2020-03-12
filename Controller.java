@@ -33,10 +33,19 @@ public class Controller
       case RIGHT:                    // Right arrow
         model.moveBat( +1 );         // Move bat right
         break;
+      case M:
+        if(model.musicPlayer.getPlayer().isMute()) {
+            model.musicPlayer.unmute();
+        } else { 
+            model.musicPlayer.mute();
+        }  
+        break;
       case F:
-        model.isGameOver = true;
+        model.gameFinished = true;
+        break;
       case R:
-        model.isGameOver = false;
+        //model.initialiseGame();
+        break;
       case S :
         // stop the game
         model.setGameRunning(false);

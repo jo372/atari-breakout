@@ -47,15 +47,15 @@ public class Model
 
     // variables that control the game 
     public boolean gameRunning = true;  // Set false to stop the game
-    public boolean isGameOver = false;
     // initialisation parameters for the model
     public int windowWidth;                   // Width of game
     public int windowHeight;                  // Height of game
 
-    MusicPlayer musicPlayer;
+    public MusicPlayer musicPlayer;
     boolean musicInitalised = false;
     
     int songId = 0;
+    public boolean gameFinished = false;
     
     // CONSTRUCTOR - needs to know how big the window will be
     public Model( int w, int h )
@@ -88,12 +88,12 @@ public class Model
         // **************************************************************
 
         int rowCounter = 0;
-        int maxRowsCounter = 6;
+        //int maxRowsCounter = 6;
         int columnCounter = 0;
         int maxColumnCounter = 20;
   
         BRICK_WIDTH = windowWidth/maxColumnCounter;
-        for (rowCounter = 0; rowCounter < maxRowsCounter; rowCounter++) { 
+        for (rowCounter = 0; rowCounter < BRICK_COLORS.size(); rowCounter++) { 
             Color brickColor = BRICK_COLORS.get(rowCounter);
             for (columnCounter = 0; columnCounter < maxColumnCounter; columnCounter++) {
                 BrickObj brick = new BrickObj(BRICK_WIDTH*columnCounter, rowCounter*BRICK_HEIGHT, BRICK_WIDTH, BRICK_HEIGHT, brickColor);
@@ -154,8 +154,7 @@ public class Model
 
     // updating the game - this happens about 50 times a second to give the impression of movement
     public synchronized void updateGame()
-    {
-        if (bricks.size() == 0) { isGameOver = true; }
+    {   
         // if the music hasn't initalised and has songs, play first song.
         if (!musicInitalised && musicPlayer.hasSongs()) { 
             musicInitalised = true;

@@ -13,8 +13,19 @@ import java.util.Arrays;
 // every 20 milliseconds and checks for collisions 
 public class Model 
 {
+    // Bat variables
+    public BatObj bat;                 // The bat
     public Color BAT_COLOR = Color.web("#C84848");
+    
+    // Ball variables
+    public BallObj ball;                // The ball
     public Color BALL_COLOR = Color.web("#C84848");
+    public int BALL_SIZE      = 10;     // Ball side
+    public int ballX = 0;
+    public int ballY = 0;
+    
+    // Brick variables
+    public ArrayList<BrickObj> bricks;   // The bricks
     public ArrayList<Color> BRICK_COLORS = new ArrayList<Color>(Arrays.asList(
         Color.web("#C84848"),
         Color.web("#C66C3A"),
@@ -23,39 +34,28 @@ public class Model
         Color.web("#48A048"),
         Color.web("#4248C8")
     ));
-    // First,a collection of useful values for calculating sizes and layouts etc.
-    public int BALL_SIZE      = 10;     // Ball side
-    public int BRICK_WIDTH    = 40;     // Brick size
-    public int BRICK_HEIGHT   = 20;
-
-    public int HIT_BRICK      = 50;     // Score for hitting a brick
-    public int HIT_BOTTOM     = -200;   // Score (penalty) for hitting the bottom of the screen
+    public int BRICK_WIDTH = 40;     // Brick size
+    public int BRICK_HEIGHT = 20;
+    public int HIT_BRICK = 50;     // Score for hitting a brick
+    public int HIT_BOTTOM = -200;   // Score (penalty) for hitting the bottom of the screen
 
     // The other parts of the model-view-controller setup
     View view;
     Controller controller;
-
-    // The game 'model' - these represent the state of the game
-    // and are used by the View to display it
-    public BallObj ball;                // The ball
-    public int ballX = 0;
-    public int ballY = 0;
-
-    public ArrayList<BrickObj> bricks;   // The bricks
-    public BatObj bat;                 // The bat
+    
+    // game variables 
     public int score = 0;               // The score
-
-    // variables that control the game 
     public boolean gameRunning = true;  // Set false to stop the game
-    // initialisation parameters for the model
+    public boolean gameFinished = false;
+    
+    // window variables
     public int windowWidth;                   // Width of game
     public int windowHeight;                  // Height of game
-
+    
+    // music player variables
     public MusicPlayer musicPlayer;
     boolean musicInitalised = false;
-    
     int songId = 0;
-    public boolean gameFinished = false;
     
     // CONSTRUCTOR - needs to know how big the window will be
     public Model( int w, int h )
@@ -64,43 +64,50 @@ public class Model
         windowWidth = w; 
         windowHeight = h;
     }
-
+    
+    public ArrayList<BrickObj> createLevel(int maxColumns, int maxRows, ArrayList<Color> BrickColors) {
+        
+        // creating an new array list for the level
+        ArrayList<BrickObj> level = new ArrayList<BrickObj>();
+        
+        // creating an row and column counter
+        int rowCounter = 0;
+        int columnCounter = 0;
+        
+        // reassigning brick width to fit the amount of columns we want.
+        BRICK_WIDTH = windowWidth/maxColumns;
+        
+        // looping for how many rows we want.
+        for (rowCounter = 0; rowCounter < maxRows; rowCounter++) { 
+            Color brickColor = BRICK_COLORS.get(rowCounter); // what will I do about this??
+            for (columnCounter = 0; columnCounter < maxColumns; columnCounter++) {
+                BrickObj brick = new BrickObj(BRICK_WIDTH*columnCounter, rowCounter*BRICK_HEIGHT, BRICK_WIDTH, BRICK_HEIGHT, brickColor);
+                level.add(brick);
+            }
+        }
+        
+        // returning the brick object array.
+        return level;
+    }
+    
     // Initialise the game - reset the score and create the game objects 
     public void initialiseGame()
-    {       
-        score = 0;
+    {                
+        // declaring a new media player.
+        musicPlayer = new MusicPlayer("resources/music/");
+       
+        // creating a new ball object.
         ball   = new BallObj(windowWidth/2, windowHeight/2, BALL_SIZE, BALL_SIZE, BALL_COLOR );
         ball.setMoveSpeed(3);
 
+        // creating a new bat object.
         bat    = new BatObj(windowWidth/2, windowHeight - BRICK_HEIGHT*3/2, BRICK_WIDTH*3, 
             BRICK_HEIGHT/4, BAT_COLOR);
         // setting the bat move speed.
         bat.setMoveSpeed(6); 
 
-        bricks = new ArrayList<>();
-
-        // declaring a new media player.
-        musicPlayer = new MusicPlayer("resources/music/");
-
-        // TODO: add code to add songs 
-        // *[1]******************************************************[1]*
-        // * Fill in code to add the bricks to the arrayList            *
-        // **************************************************************
-
-        int rowCounter = 0;
-        //int maxRowsCounter = 6;
-        int columnCounter = 0;
-        int maxColumnCounter = 20;
-  
-        BRICK_WIDTH = windowWidth/maxColumnCounter;
-        for (rowCounter = 0; rowCounter < BRICK_COLORS.size(); rowCounter++) { 
-            Color brickColor = BRICK_COLORS.get(rowCounter);
-            for (columnCounter = 0; columnCounter < maxColumnCounter; columnCounter++) {
-                BrickObj brick = new BrickObj(BRICK_WIDTH*columnCounter, rowCounter*BRICK_HEIGHT, BRICK_WIDTH, BRICK_HEIGHT, brickColor);
-                bricks.add(brick);       // add this brick to the list of bricks
-            }
-        }
-
+        // creating a new array for the bricks. 20 columns by amount of colours.
+        bricks = this.createLevel(20, BRICK_COLORS.size(), BRICK_COLORS);
     }
 
     // Animating the game
@@ -144,7 +151,6 @@ public class Model
                 updateGame();                        // update the game state
                 modelChanged();                      // Model changed - refresh screen
                 Thread.sleep(1000/70);
-                //Thread.sleep( getFast() ? 10 : 20 ); // wait a few milliseconds
             }
         } catch (Exception e) 
         { 
@@ -176,41 +182,34 @@ public class Model
         // move the ball one step (the ball knows which direction it is moving in)
         ball.moveX(ball.getMoveSpeed());                      
         ball.moveY(ball.getMoveSpeed());
+        
         // get the current ball possition (top left corner)
         ballX = ball.getTopX();  
         ballY = ball.getTopY();
+        
         // Deal with possible edge of board hit
         if (ballX >= windowWidth - BALL_SIZE)  ball.changeDirectionX();
+        
         if (ballX <= 0)  ball.changeDirectionX();
+        
         if (ballY >= windowHeight - BALL_SIZE)  // Bottom
         { 
             ball.changeDirectionY(); 
             addToScore( HIT_BOTTOM );     // score penalty for hitting the bottom of the screen
         }
+        
         if (ballY <= 0)  ball.changeDirectionY();
-
-        // check whether ball has hit a (visible) brick
-        boolean hit = false;
-
-        // *[2]******************************************************[2]*
-        // * Fill in code to check if a visible brick has been hit      *
-        // * The ball has no effect on an invisible brick               *
-        // * If a brick has been hit, change its 'visible' setting to   *
-        // * false so that it will 'disappear'                          * 
-        // **************************************************************
+    
         for(int i=0; i < bricks.size(); i++) {
             BrickObj brick = bricks.get(i);
             if(brick.isVisible() && brick.hitBy(ball)) {
-                hit = true;
+                ball.changeDirectionY();
                 brick.setVisible(false); // set the brick invisible
                 addToScore(HIT_BRICK); // add to score for hitting a brick
                 bricks.remove(i); // removing the brick from the array, it's not longer needed and garbage collection can clear it up.
             }
         }
-
-        if (hit)
-            ball.changeDirectionY();
-
+        
         // check whether ball has hit the bat
         if ( ball.hitBy(bat) )
             ball.changeDirectionY();

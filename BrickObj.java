@@ -1,7 +1,7 @@
 import javafx.scene.paint.Color;
 import java.util.Random;
 
-public class BrickObj extends GameObj 
+public class BrickObj extends GameObj
 {
     private double randomChance = generateRandomNumber(0, 100);
     

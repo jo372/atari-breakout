@@ -44,7 +44,7 @@ public class Controller
         model.gameFinished = true;
         break;
       case R:
-        //model.initialiseGame();
+        
         break;
       case S :
         // stop the game

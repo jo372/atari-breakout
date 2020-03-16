@@ -45,7 +45,7 @@ public class Main extends Application
         // start up the GUI (view), and then tell the model to initialise itself
         // and start the game running
         view.start(window); 
-		model.initialiseGame();					   
+        model.initialiseGame();                    
         model.startGame();
 
         // application is now running

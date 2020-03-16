@@ -2,4 +2,8 @@
 comment0.target=BrickObj
 comment1.params=x\ y\ width\ height\ color
 comment1.target=BrickObj(int,\ int,\ int,\ int,\ javafx.scene.paint.Color)
-numComments=2
+comment2.params=
+comment2.target=double\ getRandomChance()
+comment3.params=min\ max
+comment3.target=double\ generateRandomNumber(int,\ int)
+numComments=4

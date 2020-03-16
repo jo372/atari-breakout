@@ -33,18 +33,24 @@ public class Controller
       case RIGHT:                    // Right arrow
         model.moveBat( +1 );         // Move bat right
         break;
-      case F :
-        // Very fast ball movement
-        model.setFast(true);
+      case M:
+        if(model.musicPlayer.getPlayer().isMute()) {
+            model.musicPlayer.unmute();
+        } else { 
+            model.musicPlayer.mute();
+        }  
         break;
-      case N :
-        // Normal speed ball movement
-        model.setFast(false);
+      case F:
+        model.gameFinished = true;
+        break;
+      case R:
+        
         break;
       case S :
         // stop the game
         model.setGameRunning(false);
         break;
+        
     }
   }
 }

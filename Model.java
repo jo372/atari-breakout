@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+import java.util.Arrays;
 // The model represents all the actual content and functionality of the app
 // For Breakout, it manages all the game objects that the View needs
 // (the bat, ball, bricks, and the score), provides methods to allow the Controller
@@ -12,40 +13,50 @@ import javafx.util.Duration;
 // every 20 milliseconds and checks for collisions 
 public class Model 
 {
-    // First,a collection of useful values for calculating sizes and layouts etc.
-    public int BALL_SIZE      = 10;     // Ball side
-    public int BRICK_WIDTH    = 40;     // Brick size
-    public int BRICK_HEIGHT   = 20;
+    // Bat variables
+    public BatObj bat;                 // The bat
+    public Color BAT_COLOR = Color.web("#C84848");
     
-    public int HIT_BRICK      = 50;     // Score for hitting a brick
-    public int HIT_BOTTOM     = -200;   // Score (penalty) for hitting the bottom of the screen
+    // Ball variables
+    public BallObj ball;                // The ball
+    public Color BALL_COLOR = Color.web("#C84848");
+    public int BALL_SIZE      = 10;     // Ball side
+    public int ballX = 0;
+    public int ballY = 0;
+    
+    // Brick variables
+    public ArrayList<BrickObj> bricks;   // The bricks
+    public ArrayList<Color> BRICK_COLORS = new ArrayList<Color>(Arrays.asList(
+        Color.web("#C84848"),
+        Color.web("#C66C3A"),
+        Color.web("#B47A30"),
+        Color.web("#A2A22A"),
+        Color.web("#48A048"),
+        Color.web("#4248C8")
+    ));
+    public int BRICK_WIDTH = 40;     // Brick size
+    public int BRICK_HEIGHT = 20;
+    public int HIT_BRICK = 50;     // Score for hitting a brick
+    public int HIT_BOTTOM = -200;   // Score (penalty) for hitting the bottom of the screen
 
     // The other parts of the model-view-controller setup
     View view;
     Controller controller;
-
-    // The game 'model' - these represent the state of the game
-    // and are used by the View to display it
-    public BallObj ball;                // The ball
-    public int ballX = 0;
-    public int ballY = 0;
     
-    public ArrayList<BrickObj> bricks;   // The bricks
-    public BatObj bat;                 // The bat
+    // game variables 
     public int score = 0;               // The score
- 
-    // variables that control the game 
     public boolean gameRunning = true;  // Set false to stop the game
-    public boolean fast = false;        // Set true to make the ball go faster
-
-    // initialisation parameters for the model
+    public boolean gameFinished = false;
+    
+    // window variables
     public int windowWidth;                   // Width of game
     public int windowHeight;                  // Height of game
     
-    MusicPlayer musicPlayer;
+    // music player variables
+    public MusicPlayer musicPlayer;
     boolean musicInitalised = false;
     int songId = 0;
-    Duration mediaDuration;
+    
     // CONSTRUCTOR - needs to know how big the window will be
     public Model( int w, int h )
     {
@@ -53,42 +64,50 @@ public class Model
         windowWidth = w; 
         windowHeight = h;
     }
-
-    // Initialise the game - reset the score and create the game objects 
-    public void initialiseGame()
-    {       
-        score = 0;
-        ball   = new BallObj(windowWidth/2, windowHeight/2, BALL_SIZE, BALL_SIZE, Color.RED );
-        ball.setMoveSpeed(3);
+    
+    public ArrayList<BrickObj> createLevel(int maxColumns, int maxRows, ArrayList<Color> BrickColors) {
         
-        bat    = new BatObj(windowWidth/2, windowHeight - BRICK_HEIGHT*3/2, BRICK_WIDTH*3, 
-            BRICK_HEIGHT/4, Color.GRAY);
-        // setting the bat move speed.
-        bat.setMoveSpeed(3); 
+        // creating an new array list for the level
+        ArrayList<BrickObj> level = new ArrayList<BrickObj>();
         
-        bricks = new ArrayList<>();
-        // declaring a new media player.
-        musicPlayer = new MusicPlayer("resources/music/");
-
-        // TODO: add code to add songs 
-        
-        // *[1]******************************************************[1]*
-        // * Fill in code to add the bricks to the arrayList            *
-        // **************************************************************
-        int NUM_BRICKS = windowWidth/BRICK_WIDTH;     // how many bricks fit on screen
-        
+        // creating an row and column counter
         int rowCounter = 0;
-        int maxRowsCounter = 2;
         int columnCounter = 0;
-        int maxColumnCounter = 20;
-        BRICK_WIDTH = windowWidth/maxColumnCounter;
-        for (rowCounter = 0; rowCounter < maxRowsCounter; rowCounter++) { 
-            for (columnCounter = 0; columnCounter < maxColumnCounter; columnCounter++) {
-                BrickObj brick = new BrickObj(BRICK_WIDTH*columnCounter, rowCounter*BRICK_HEIGHT, BRICK_WIDTH, BRICK_HEIGHT,Color.BLUE);
-                bricks.add(brick);       // add this brick to the list of bricks
+        
+        // reassigning brick width to fit the amount of columns we want.
+        BRICK_WIDTH = windowWidth/maxColumns;
+        
+        // looping for how many rows we want.
+        for (rowCounter = 0; rowCounter < maxRows; rowCounter++) { 
+            Color brickColor = BRICK_COLORS.get(rowCounter); // what will I do about this??
+            for (columnCounter = 0; columnCounter < maxColumns; columnCounter++) {
+                BrickObj brick = new BrickObj(BRICK_WIDTH*columnCounter, rowCounter*BRICK_HEIGHT, BRICK_WIDTH, BRICK_HEIGHT, brickColor);
+                level.add(brick);
             }
         }
+        
+        // returning the brick object array.
+        return level;
+    }
+    
+    // Initialise the game - reset the score and create the game objects 
+    public void initialiseGame()
+    {                
+        // declaring a new media player.
+        musicPlayer = new MusicPlayer("resources/music/");
+       
+        // creating a new ball object.
+        ball   = new BallObj(windowWidth/2, windowHeight/2, BALL_SIZE, BALL_SIZE, BALL_COLOR );
+        ball.setMoveSpeed(3);
 
+        // creating a new bat object.
+        bat    = new BatObj(windowWidth/2, windowHeight - BRICK_HEIGHT*3/2, BRICK_WIDTH*3, 
+            BRICK_HEIGHT/4, BAT_COLOR);
+        // setting the bat move speed.
+        bat.setMoveSpeed(6); 
+
+        // creating a new array for the bricks. 20 columns by amount of colours.
+        bricks = this.createLevel(20, BRICK_COLORS.size(), BRICK_COLORS);
     }
 
     // Animating the game
@@ -99,7 +118,7 @@ public class Model
     // a loop, updating the position of the ball, checking if it hits anything
     // (and changing direction if it does) and then telling the View the Model 
     // changed.
-    
+
     // When we use more than one thread, we have to take care that they don't
     // interfere with each other (for example, one thread changing the value of 
     // a variable at the same time the other is reading it). We do this by 
@@ -107,7 +126,7 @@ public class Model
     // be running at a time - if another thread tries to run the same or another
     // synchronized method on the same object, it will stop and wait for the
     // first one to finish.
-    
+
     // Start the animation thread
     public void startGame()
     {
@@ -116,8 +135,11 @@ public class Model
         t.start();                                  // Start the thread running
     }   
     
-    // The main animation loop
+    //TODO: implement a pause game, we can do this by stop the ball and bat moving.
+    // need to store their previous values elsewhere and reset when the game isn't paused anymore.
     
+    // The main animation loop
+
     public void runGame()
     {
         try
@@ -129,7 +151,6 @@ public class Model
                 updateGame();                        // update the game state
                 modelChanged();                      // Model changed - refresh screen
                 Thread.sleep(1000/70);
-                //Thread.sleep( getFast() ? 10 : 20 ); // wait a few milliseconds
             }
         } catch (Exception e) 
         { 
@@ -139,64 +160,56 @@ public class Model
 
     // updating the game - this happens about 50 times a second to give the impression of movement
     public synchronized void updateGame()
-    {
-        if (!musicInitalised) { 
-            musicPlayer.playSongById(songId);
+    {   
+        // if the music hasn't initalised and has songs, play first song.
+        if (!musicInitalised && musicPlayer.hasSongs()) { 
             musicInitalised = true;
-            mediaDuration = musicPlayer.getMedia().getDuration();
-        }
-        // checking the duration and making sure the song has finished.
-        //musicPlayer.getMediaPlayer().getCurrentTime().greaterThanOrEqualTo()
-        if(musicPlayer.getMediaPlayer().getCurrentTime() != musicPlayer.getMedia().getDuration()) 
-        {
-            if(songId > musicPlayer.getMediaList().size()) { 
-                songId = 0; 
-            } else { 
-                songId ++; 
-            }
             musicPlayer.playSongById(songId);
+        } else {
+            // if the music player's time is greater than or equal to the song duration increment songid.
+            if(musicPlayer.getPlayer().getCurrentTime().greaterThanOrEqualTo(musicPlayer.getMedia().getDuration())) 
+            {
+                songId++;
+                musicPlayer.playSongById(songId);
+                // if the songId is equal to that of the medialist size, we're on the last song :(, time to repeat.
+                if(songId == musicPlayer.getMediaList().size() -1) { 
+                    songId = 0; 
+                }
+                Debug.trace("SongId: %d PlaylistSize: %d", songId, musicPlayer.getMediaList().size());
+            }
         }
-        
-        
         
         // move the ball one step (the ball knows which direction it is moving in)
         ball.moveX(ball.getMoveSpeed());                      
         ball.moveY(ball.getMoveSpeed());
+        
         // get the current ball possition (top left corner)
         ballX = ball.getTopX();  
         ballY = ball.getTopY();
+        
         // Deal with possible edge of board hit
         if (ballX >= windowWidth - BALL_SIZE)  ball.changeDirectionX();
+        
         if (ballX <= 0)  ball.changeDirectionX();
+        
         if (ballY >= windowHeight - BALL_SIZE)  // Bottom
         { 
             ball.changeDirectionY(); 
             addToScore( HIT_BOTTOM );     // score penalty for hitting the bottom of the screen
         }
+        
         if (ballY <= 0)  ball.changeDirectionY();
-            
-       // check whether ball has hit a (visible) brick
-        boolean hit = false;
-
-        // *[2]******************************************************[2]*
-        // * Fill in code to check if a visible brick has been hit      *
-        // * The ball has no effect on an invisible brick               *
-        // * If a brick has been hit, change its 'visible' setting to   *
-        // * false so that it will 'disappear'                          * 
-        // **************************************************************
+    
         for(int i=0; i < bricks.size(); i++) {
             BrickObj brick = bricks.get(i);
             if(brick.isVisible() && brick.hitBy(ball)) {
-                hit = true;
+                ball.changeDirectionY();
                 brick.setVisible(false); // set the brick invisible
                 addToScore(HIT_BRICK); // add to score for hitting a brick
                 bricks.remove(i); // removing the brick from the array, it's not longer needed and garbage collection can clear it up.
             }
         }
-    
-        if (hit)
-            ball.changeDirectionY();
-
+        
         // check whether ball has hit the bat
         if ( ball.hitBy(bat) )
             ball.changeDirectionY();
@@ -211,66 +224,53 @@ public class Model
     {
         Platform.runLater(view::update);
     }
-    
-    
+
     // Methods for accessing and updating values
     // these are all synchronized so that the can be called by the main thread 
     // or the animation thread safely
-    
+
     // Change game running state - set to false to stop the game
     public synchronized void setGameRunning(Boolean value)
     {  
         gameRunning = value;
     }
-    
+
     // Return game running state
     public synchronized Boolean getGameRunning()
     {  
         return gameRunning;
     }
-
-    // Change game speed - false is normal speed, true is fast
-    public synchronized void setFast(Boolean value)
-    {  
-        fast = value;
-    }
     
-    // Return game speed - false is normal speed, true is fast
-    public synchronized Boolean getFast()
-    {  
-        return(fast);
-    }
-
     // Return bat object
     public synchronized BatObj getBat()
     {
         return(bat);
     }
-    
+
     // return ball object
     public synchronized BallObj getBall()
     {
         return(ball);
     }
-    
+
     // return bricks
     public synchronized ArrayList<BrickObj> getBricks()
     {
         return(bricks);
     }
-    
+
     // return score
     public synchronized int getScore()
     {
         return(score);
     }
-    
-     // update the score
+
+    // update the score
     public synchronized void addToScore(int n)    
     {
         score += n;        
     }
-    
+
     // move the bat one step - -1 is left, +1 is right
     public synchronized void moveBat( int direction )
     {        
@@ -279,4 +279,3 @@ public class Model
         bat.moveX(dist);
     }
 }   
-    

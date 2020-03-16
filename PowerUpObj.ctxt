@@ -1,0 +1,5 @@
+#BlueJ class context
+comment0.target=PowerUpObj
+comment1.params=x\ y\ width\ height\ color
+comment1.target=PowerUpObj(int,\ int,\ int,\ int,\ javafx.scene.paint.Color)
+numComments=2

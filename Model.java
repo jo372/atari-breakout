@@ -34,11 +34,21 @@ public class Model
         Color.web("#48A048"),
         Color.web("#4248C8")
     ));
+    public int brickBottomY = 0;
     public int BRICK_WIDTH = 40;     // Brick size
     public int BRICK_HEIGHT = 20;
     public int HIT_BRICK = 50;     // Score for hitting a brick
     public int HIT_BOTTOM = -200;   // Score (penalty) for hitting the bottom of the screen
-
+    
+    // Powerups variables 
+    public ArrayList<PowerUpObj> powerups = new ArrayList<PowerUpObj>();
+    public int powerupWidth = 10;
+    public int powerupHeight = 10;
+    public int POWERUP_MOVESPEED;
+    public Color powerupColor = Color.PURPLE;
+    // Debuff variables 
+    public ArrayList<DebuffObj> debuffs = new ArrayList<DebuffObj>();
+    
     // The other parts of the model-view-controller setup
     View view;
     Controller controller;
@@ -99,12 +109,14 @@ public class Model
         // creating a new ball object.
         ball   = new BallObj(windowWidth/2, windowHeight/2, BALL_SIZE, BALL_SIZE, BALL_COLOR );
         ball.setMoveSpeed(3);
-
+        
+        POWERUP_MOVESPEED = ball.getMoveSpeed();
+        
         // creating a new bat object.
         bat    = new BatObj(windowWidth/2, windowHeight - BRICK_HEIGHT*3/2, BRICK_WIDTH*3, 
             BRICK_HEIGHT/4, BAT_COLOR);
         // setting the bat move speed.
-        bat.setMoveSpeed(6); 
+        bat.setMoveSpeed(8); 
 
         // creating a new array for the bricks. 20 columns by amount of colours.
         bricks = this.createLevel(20, BRICK_COLORS.size(), BRICK_COLORS);
@@ -183,6 +195,17 @@ public class Model
         ball.moveX(ball.getMoveSpeed());                      
         ball.moveY(ball.getMoveSpeed());
         
+        for(int j=0; j < powerups.size(); j++){
+            PowerUpObj powerup = powerups.get(j);
+            if(powerup.isVisible()) { 
+                powerup.moveY(POWERUP_MOVESPEED);
+                if(powerup.hitBy(bat)) {
+                    powerup.setVisible(false);
+                    powerups.remove(j);
+                    bat.setMoveSpeed(bat.getMoveSpeed()+5);
+                }
+            }
+        }
         // get the current ball possition (top left corner)
         ballX = ball.getTopX();  
         ballY = ball.getTopY();
@@ -199,20 +222,36 @@ public class Model
         }
         
         if (ballY <= 0)  ball.changeDirectionY();
-    
+        
+        // looping through the bricks, if visible and hit by ball, change direciton of the ball, set visible false, addtoscore and remove from the bricks array for garbage collection.
         for(int i=0; i < bricks.size(); i++) {
+            
             BrickObj brick = bricks.get(i);
+            
             if(brick.isVisible() && brick.hitBy(ball)) {
+                
+                // generating a new debuff or powerup if the threshold is greater or equal to 60%.
+                if (brick.getRandomChance() >= 60) {
+                    
+                    brickBottomY = (brick.getTopY() + BRICK_HEIGHT);
+                    // getTopX / 2 to center the powerup,
+                    PowerUpObj powerup = new PowerUpObj(brick.getTopX() + (BRICK_WIDTH/2), brickBottomY, powerupWidth, powerupHeight, powerupColor);
+                    powerups.add(powerup);
+                }
+                
                 ball.changeDirectionY();
-                brick.setVisible(false); // set the brick invisible
-                addToScore(HIT_BRICK); // add to score for hitting a brick
-                bricks.remove(i); // removing the brick from the array, it's not longer needed and garbage collection can clear it up.
+                brick.setVisible(false);
+                addToScore(HIT_BRICK);
+                bricks.remove(i);
             }
         }
         
+        
         // check whether ball has hit the bat
-        if ( ball.hitBy(bat) )
+        if ( ball.hitBy(bat) ) {
             ball.changeDirectionY();
+        }
+            
     }
 
     // This is how the Model talks to the View
@@ -258,12 +297,21 @@ public class Model
     {
         return(bricks);
     }
-
+    
+    public synchronized ArrayList<PowerUpObj> getPowerups() {
+        return(powerups);
+    }
+    
+    public synchronized ArrayList<DebuffObj> getDebuffs() {
+        return(debuffs);
+    }
+    
     // return score
     public synchronized int getScore()
     {
         return(score);
     }
+    
 
     // update the score
     public synchronized void addToScore(int n)    

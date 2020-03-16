@@ -34,6 +34,8 @@ public class View implements EventHandler<KeyEvent>
     public BatObj   bat;            // The bat
     public BallObj   ball;           // The ball
     public ArrayList<BrickObj> bricks;     // The bricks
+    public ArrayList<PowerUpObj> powerups; // powerups
+    public ArrayList<DebuffObj> debuffs; // debuffs
     public int       score =  0;     // The score
    
     // we don't really need a constructor method, but include one to print a 
@@ -110,12 +112,22 @@ public class View implements EventHandler<KeyEvent>
             // draw the bat and ball
             displayGameObj( gc, ball );   // Display the Ball
             displayGameObj( gc, bat  );   // Display the Bat
-
-            // *[3]****************************************************[3]*
-            // * Display the bricks that make up the game                 *
-            // * Fill in code to display bricks from the ArrayList        *
-            // * Remember only a visible brick is to be displayed         *
-            // ************************************************************
+            
+            // rending powerups to the screen only if they are visible.
+            for(GameObj powerup: powerups) {
+                if(powerup.isVisible()) {
+                    displayGameObj( gc, powerup);
+                }
+            }
+            
+            // rending debuffs to the screen only if they are visible.
+            for(GameObj debuff: debuffs) {
+                if(debuff.isVisible()) {
+                    displayGameObj( gc, debuff);
+                }
+            }
+            
+            // rending bricks to the screen only if they are visible.
             for (GameObj brick: bricks) {
                 if (brick.isVisible()) {
                     displayGameObj(gc, brick);
@@ -141,6 +153,8 @@ public class View implements EventHandler<KeyEvent>
         bricks  = model.getBricks();            // Bricks
         bat     = model.getBat();               // Bat
         score   = model.getScore();             // Score
+        powerups = model.getPowerups();
+        debuffs = model.getDebuffs();
         //Debug.trace("Update");
         drawPicture();                     // Re draw game
     }

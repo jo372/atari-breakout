@@ -5,6 +5,8 @@
     import javafx.scene.media.MediaPlayer;
     import javafx.util.Duration;
     import java.util.Arrays;
+    import javafx.scene.image.Image;
+    import java.util.Random;
     // The model represents all the actual content and functionality of the app
     // For Breakout, it manages all the game objects that the View needs
     // (the bat, ball, bricks, and the score), provides methods to allow the Controller
@@ -13,6 +15,9 @@
     // every 20 milliseconds and checks for collisions 
     public class Model 
     {
+        
+        public int lives = 3;
+        public boolean isOver = false;
         // Bat variables
         public BatObj bat;                 // The bat
         public Color BAT_COLOR = Color.web("#C84848");
@@ -35,19 +40,23 @@
             Color.web("#4248C8")
         ));
         public int brickBottomY = 0;
-        public int BRICK_WIDTH = 40;     // Brick size
-        public int BRICK_HEIGHT = 20;
-        public int HIT_BRICK = 50;     // Score for hitting a brick
-        public int HIT_BOTTOM = -200;   // Score (penalty) for hitting the bottom of the screen
+        public int BRICK_WIDTH = 0;     // Brick size
+        public final int BRICK_HEIGHT = 20;
+        public final int HIT_BRICK = 50;     // Score for hitting a brick
+        public final int HIT_BOTTOM_SCORE = -200;   // Score (penalty) for hitting the bottom of the screen
         
         // Powerups variables 
-        public ArrayList<PowerUpObj> powerups = new ArrayList<PowerUpObj>();
+        public ArrayList<Buff> powerups = new ArrayList<Buff>();
         public int powerupWidth = 10;
         public int powerupHeight = 10;
-        public int POWERUP_MOVESPEED;
         public Color powerupColor = Color.PURPLE;
+        public ArrayList<Image> powerupsSprites = new ArrayList<Image>(Arrays.asList(
+            new Image("file:resources/buffs/speed.png", powerupWidth, powerupHeight, false, false),
+            new Image("file:resources/buffs/heart.png", powerupWidth, powerupHeight, false, false)
+        ));
+        public final int POWERUP_MOVESPEED = 5;
         // Debuff variables 
-        public ArrayList<DebuffObj> debuffs = new ArrayList<DebuffObj>();
+        public ArrayList<Buff> debuffs = new ArrayList<Buff>();
         
         // The other parts of the model-view-controller setup
         View view;
@@ -67,6 +76,12 @@
         boolean musicInitalised = false;
         int songId = 0;
         
+        // scoreboard variables
+        public boolean isTabPressed = false;
+        Scoreboard playerScores = new Scoreboard();
+        ScoreboardUser current_user;
+        
+        private Random rand = new Random();
         // CONSTRUCTOR - needs to know how big the window will be
         public Model( int w, int h )
         {
@@ -102,24 +117,33 @@
         
         // Initialise the game - reset the score and create the game objects 
         public void initialiseGame()
-        {                
+        {   
+            
+            for(int i=0; i < 10; i++ ) {
+                ScoreboardUser user = new ScoreboardUser((i+1), "test " + i, i);
+                playerScores.add(user);
+            }
+            
+            current_user = new ScoreboardUser((playerScores.getUsers().size()+1), "New Player", 0);
+            playerScores.add(current_user);
+            
+            // creating a new array for the bricks. 20 columns by amount of colours.
+            bricks = this.createLevel(20, BRICK_COLORS.size(), BRICK_COLORS);
+            
             // declaring a new media player.
             musicPlayer = new MusicPlayer("resources/music/");
-           
+            musicPlayer.setVolume(0.1);
+            
             // creating a new ball object.
-            ball   = new BallObj(windowWidth/2, windowHeight/2, BALL_SIZE, BALL_SIZE, BALL_COLOR );
+            ball = new BallObj(windowWidth/2, windowHeight/2, BALL_SIZE, BALL_SIZE, BALL_COLOR );
             ball.setMoveSpeed(3);
             
-            POWERUP_MOVESPEED = ball.getMoveSpeed();
-            
             // creating a new bat object.
-            bat    = new BatObj(windowWidth/2, windowHeight - BRICK_HEIGHT*3/2, BRICK_WIDTH*3, 
+            bat = new BatObj(windowWidth/2, windowHeight - BRICK_HEIGHT*3/2, BRICK_WIDTH*3, 
                 BRICK_HEIGHT/4, BAT_COLOR);
             // setting the bat move speed.
             bat.setMoveSpeed(8); 
-    
-            // creating a new array for the bricks. 20 columns by amount of colours.
-            bricks = this.createLevel(20, BRICK_COLORS.size(), BRICK_COLORS);
+           
         }
     
         // Animating the game
@@ -152,7 +176,7 @@
         
         // The main animation loop
         private double generateRandomNumber(int min, int max) {
-            return min + Math.random() * (max - min);
+            return (int) rand.nextInt(max - min + 1) + min;
         }
         
         public void runGame()
@@ -172,10 +196,21 @@
                 Debug.error("Model::runAsSeparateThread error: " + e.getMessage() );
             }
         }
-    
+        
+        private void stopGame() { 
+            isOver = true;
+            musicPlayer.stop();
+            setGameRunning(false);
+        }
+        
         // updating the game - this happens about 50 times a second to give the impression of movement
         public synchronized void updateGame()
         {   
+            if((lives < 0) || (bricks.size() == 0)) {
+                stopGame();
+            }
+  
+            playerScores.getUserById(playerScores.getUsers().size()-1).updateScore(score);
             // if the music hasn't initalised and has songs, play first song.
             if (!musicInitalised && musicPlayer.hasSongs()) { 
                 musicInitalised = true;
@@ -199,21 +234,19 @@
             ball.moveY(ball.getMoveSpeed());
             
             for(int j=0; j < powerups.size(); j++){
-                PowerUpObj powerup = powerups.get(j);
+                Buff powerup = powerups.get(j);
                 if(powerup.isVisible()) { 
                     powerup.moveY(POWERUP_MOVESPEED);
                     if(powerup.hitBy(bat)) {
                         powerup.setVisible(false);
                         powerups.remove(j);
-                        
-                        //TODO: add more powerups
-                        int powerupType = (int) this.generateRandomNumber(1, 2);
-                        switch(powerupType) {
+                           
+                        switch(powerup.getType()) {
                             case 1:
-                                bat.setMoveSpeed(bat.getMoveSpeed()+1);
+                                bat.setMoveSpeed(bat.getMoveSpeed()+5);
                             break;
                             case 2:
-                                score += 20;
+                                lives += 1;
                             break;
                     }
                     // depending on what random number we get will depend on what happens to the player.
@@ -232,8 +265,9 @@
         
         if (ballY >= windowHeight - BALL_SIZE)  // Bottom
         { 
+            lives -= 1;
             ball.changeDirectionY(); 
-            addToScore( HIT_BOTTOM );     // score penalty for hitting the bottom of the screen
+            addToScore( HIT_BOTTOM_SCORE );     // score penalty for hitting the bottom of the screen
         }
         
         if (ballY <= 0)  ball.changeDirectionY();
@@ -251,7 +285,22 @@
                     
                     brickBottomY = (brick.getTopY() + BRICK_HEIGHT);
                     // getTopX / 2 to center the powerup,
-                    PowerUpObj powerup = new PowerUpObj(brick.getTopX() + (BRICK_WIDTH/2), brickBottomY, powerupWidth, powerupHeight, powerupColor);
+                    Buff powerup = new Buff(brick.getTopX() + (BRICK_WIDTH/2), brickBottomY, powerupWidth, powerupHeight, powerupColor);
+                    
+                    int powerupType = (int) this.generateRandomNumber(1, 2);
+                    Debug.trace("type: %d", powerupType);
+                    powerup.setType(powerupType);
+
+          
+                    switch(powerupType) {
+                        case 1:
+                            powerup.setImage(powerupsSprites.get(powerupType-1));
+                            break;
+                        case 2:
+                            powerup.setImage(powerupsSprites.get(powerupType-1));
+                            break;
+                    }
+
                     powerups.add(powerup);
                 }
                 
@@ -307,6 +356,13 @@
     {
         return(ball);
     }
+    
+    // return ball object
+    public synchronized Scoreboard getScoreboard()
+    {
+        return(playerScores);
+    }
+
 
     // return bricks
     public synchronized ArrayList<BrickObj> getBricks()
@@ -314,11 +370,11 @@
         return(bricks);
     }
     
-    public synchronized ArrayList<PowerUpObj> getPowerups() {
+    public synchronized ArrayList<Buff> getPowerups() {
         return(powerups);
     }
     
-    public synchronized ArrayList<DebuffObj> getDebuffs() {
+    public synchronized ArrayList<Buff> getDebuffs() {
         return(debuffs);
     }
     
@@ -328,7 +384,11 @@
         return(score);
     }
     
-
+    public synchronized int getLives() { return lives; }
+    
+    public synchronized void addLives(int amount) {
+        lives += amount;
+    }
     // update the score
     public synchronized void addToScore(int n)    
     {

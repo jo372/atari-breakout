@@ -3,8 +3,8 @@ import java.util.Random;
 
 public class BrickObj extends GameObj
 {
-    //private double randomChance = generateRandomNumber(0, 100);
-    private double randomChance = 60.0; // for debugging
+    private double randomChance = generateRandomNumber(0, 100);
+    //private double randomChance = 60.0; // for debugging
     public BrickObj(int x, int y, int width, int height, Color color) {
         super(x, y, width, height, color);
     }

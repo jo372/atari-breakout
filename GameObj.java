@@ -1,5 +1,5 @@
 import javafx.scene.paint.*;
-
+import javafx.scene.canvas.GraphicsContext;
 // An object in the game, represented as a rectangle, with a position,
 // a colour, and a direction of movement.
 public class GameObj
@@ -15,9 +15,14 @@ public class GameObj
     private int dirY   = 1;            // Direction Y (1 or -1)
     private int moveSpeed = 3; 
     private double opacity = 1.0;
-
-    // TODO: add velocity.
     
+    /**
+     * @param x x position of the game object
+     * @param y y position of the game object
+     * @param w width of the game object
+     * @param h height of the game object
+     * @param c Color of the game Obj
+     */
     public GameObj( int x, int y, int w, int h, Color c )
     {
         this.setTopX(x);
@@ -67,22 +72,28 @@ public class GameObj
         this.opacity = newOpacity;
     }
     
+    public void render(GraphicsContext gc) {
+        gc.setFill(this.getColor());
+        gc.fillRect(this.getTopX(), this.getTopY(), this.getWidth(), this.getHeight() );
+    }
+    
     public double getOpacity() { return this.opacity; }
-    // move in x axis
+    
+    /** move in x axis */
     public void moveX( int units )
     {
         this.setTopX(this.getTopX() + (units * this.getDirX()) );
     }
 
-    // move in y axis
+    /** move in y axis */
     public void moveY( int units )
     {
         this.setTopY(this.getTopY() + (units * this.getDirY()) );
     }
 
-    // Detect collision between this object and the argument object
-    // It's easiest to work out if they do NOT overlap, and then
-    // return the negative (with the ! at the beginning)
+    /** Detect collision between this object and the argument object
+     * It's easiest to work out if they do NOT overlap, and then
+      return the negative (with the ! at the beginning) */
     public boolean hitBy( GameObj obj )
     {
         return !(this.getTopX() >= (obj.getTopX() + obj.getWidth()) ||

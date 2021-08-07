@@ -16,26 +16,33 @@ public class MusicPlayer
     private ArrayList<String> mediaPaths;
     private MediaPlayer mediaPlayer;
     private Media media; 
+    private double musicVolume = 0.5;
     private boolean isPaused = false;
     private boolean isMuted = false;
+    private int songId = 0;
+    private boolean isPlaying = false;
     //private String[] whitelistedExtensions = new String[] {"mp3"};
     
     public void playSongById(int songId) {
         // checking for out of bounds.
-        if (songId > this.getMediaList().size()) 
+        if (!(songId > this.getMediaList().size())) 
         {
-        } 
-        else 
-        {
-            
+             if(this.isPlaying()) { 
+                 mediaPlayer.stop(); 
+                 isPlaying = false;
+             } 
              media = new Media(this.mediaPaths.get(songId));
              mediaPlayer = new MediaPlayer(media);
-             
-             
+             mediaPlayer.setVolume(this.getVolume());
+             this.songId = songId;
              if (this.isMuted) { this.mute(); }
-             this.play();
+             mediaPlayer.play();
+             isPlaying = true;
         }
     }
+    
+    public boolean isPlaying() { return this.isPlaying; }
+    public int getSongId() { return this.songId; }
     
     public Media getMedia() { return this.media; }
     
@@ -47,6 +54,10 @@ public class MusicPlayer
             isPaused = false;
         }
     }
+    
+    public void setVolume(double newVolume){ this.musicVolume = newVolume; }
+    
+    public double getVolume() { return this.musicVolume; }
     
     public void pause() {
         this.getPlayer().pause();

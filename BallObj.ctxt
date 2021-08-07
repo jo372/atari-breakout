@@ -1,9 +1,0 @@
-#BlueJ class context
-comment0.target=BallObj
-comment1.params=x\ y\ width\ height\ color
-comment1.target=BallObj(int,\ int,\ int,\ int,\ javafx.scene.paint.Color)
-comment2.params=
-comment2.target=void\ changeDirectionX()
-comment3.params=
-comment3.target=void\ changeDirectionY()
-numComments=4

@@ -27,11 +27,36 @@ public class Controller
       
     switch ( event.getCode() )             
     {
-      case LEFT:                     // Left Arrow
-        model.moveBat( -1);          // move bat left
+      case CLOSE_BRACKET:
+           model.songId += 1;
+           if (model.songId > model.musicPlayer.getMediaList().size()-1) {
+               model.songId = 0;
+           }
+           model.musicPlayer.playSongById(model.songId);
+           break;
+      case OPEN_BRACKET:
+           model.songId -= 1;
+            if (model.songId < 0) {
+               model.songId = model.musicPlayer.getMediaList().size()-1;
+           }
+           model.musicPlayer.playSongById(model.songId);
+           break;
+      case LEFT:                     
+        // Left Arrow
+        if (!(model.getBat().getTopX() < 0)) {
+            model.moveBat( -1);          // move bat left
+        }
         break;
-      case RIGHT:                    // Right arrow
-        model.moveBat( +1 );         // Move bat right
+      case RIGHT:                    
+        // Right arrow
+        if(!((model.getBat().getTopX() + model.getBat().getWidth()) > model.windowWidth))  {
+            model.moveBat( +1 );         // Move bat right
+        }
+        break;
+      case TAB:
+        // getting the value of tab pressed and flipping it.
+        model.isTabPressed = !model.isTabPressed;
+        model.getScoreboard().setVisiblity(model.isTabPressed);
         break;
       case M:
         if(model.musicPlayer.getPlayer().isMute()) {
@@ -43,8 +68,7 @@ public class Controller
       case F:
         model.gameFinished = true;
         break;
-      case R:
-        
+      case R: 
         break;
       case S :
         // stop the game
